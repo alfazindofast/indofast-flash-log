@@ -128,7 +128,7 @@ export default function FlashLog() {
           Vehicle Software Flash Log
         </h1>
         <p style={{ color: "#3a5a7a", fontSize: "0.8rem", margin: "4px 0 0" }}>
-          {getIST()} IST · {flashLogs.length} vehicles flashed · {availableVehicles.length} remaining
+          {getIST()} IST{" · "}{flashLogs.length} vehicles flashed{" · "}{availableVehicles.length} remaining
         </p>
       </div>
 
@@ -165,7 +165,7 @@ export default function FlashLog() {
                       onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
                     >
                       <span style={{ color: "#00d4ff", fontWeight: 600 }}>{v.vehicle_number}</span>
-                      <span style={{ color: "#3a5a7a", marginLeft: 8 }}>{v.zone} · {v.customer_name}</span>
+                      <span style={{ color: "#3a5a7a", marginLeft: 8 }}>{v.zone}{" · "}{v.customer_name}</span>
                     </div>
                   ))
                 }
@@ -285,7 +285,7 @@ export default function FlashLog() {
                       <span style={{ color: "#3a5a7a" }}>{log.flashed_at ? log.flashed_at.slice(0, 16) : ""}</span>
                     </div>
                     <div style={{ color: "#5a7a9a", marginTop: 2 }}>
-                      {log.zone} · {log.customer_name} · <span style={{ color: "#7a9aba" }}>{log.old_version} to {log.new_version}</span> · {log.technician_name}
+                      {log.zone}{" · "}{log.customer_name}{" · "}<span style={{ color: "#7a9aba" }}>{log.old_version} to {log.new_version}</span>{" · "}{log.technician_name}
                     </div>
                   </div>
                 ))}
