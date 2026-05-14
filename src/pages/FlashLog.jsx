@@ -127,7 +127,7 @@ export default function FlashLog() {
   const last10 = flashLogs.slice(0, 10);
 
   return (
-    <div style={{ maxWidth: 1100, margin: "0 auto", padding: "2rem 1.5rem" }}>
+    <div style={{ maxWidth: 720, margin: "0 auto", padding: "2rem 1.5rem" }}>
 
       {/* Header */}
       <div style={{ marginBottom: "2rem" }}>
@@ -139,9 +139,9 @@ export default function FlashLog() {
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem", maxWidth: 680 }}>
 
-        {/* LEFT: Flash Form */}
+
         <div>
           <Card title="📋 New Flash Entry">
 
@@ -251,8 +251,8 @@ export default function FlashLog() {
           </Card>
         </div>
 
-        {/* RIGHT: Summary + Last 10 */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+
+
 
           {/* Zone Summary */}
           <Card title="📊 Flashed Vehicles by Zone">
