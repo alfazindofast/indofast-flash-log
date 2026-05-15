@@ -10,7 +10,8 @@ export default function Admin() {
   const [pwError, setPwError] = useState("");
 
   // Upload state
-  const [vehicles, setVehicles] = useState([]);
+  const [totalVehicleCount, setTotalVehicleCount] = useState(0);
+  const [recentVehicles, setRecentVehicles] = useState([]); // last 50 for display
   const [manualVehicle, setManualVehicle] = useState({ vehicle_number: "", zone: "", customer_name: "" });
   const [uploadMsg, setUploadMsg] = useState("");
   const [uploadError, setUploadError] = useState("");
@@ -30,9 +31,24 @@ export default function Admin() {
   }
 
   async function fetchData() {
-    const { data: vData } = await supabase.from("vehicles").select("*").order("vehicle_number");
-    const { data: lData } = await supabase.from("flash_logs").select("*").order("flashed_at", { ascending: false });
-    if (vData) setVehicles(vData);
+    // Get exact total count without fetching all rows
+    const { count: vCount } = await supabase
+      .from("vehicles")
+      .select("*", { count: "exact", head: true });
+    if (vCount !== null) setTotalVehicleCount(vCount);
+
+    // Load only the 50 most recently added vehicles for the registry display
+    const { data: vRecent } = await supabase
+      .from("vehicles")
+      .select("id, vehicle_number, zone, customer_name")
+      .order("created_at", { ascending: false })
+      .limit(50);
+    if (vRecent) setRecentVehicles(vRecent);
+
+    const { data: lData } = await supabase
+      .from("flash_logs")
+      .select("*")
+      .order("flashed_at", { ascending: false });
     if (lData) setFlashLogs(lData);
   }
 
@@ -167,7 +183,7 @@ export default function Admin() {
           Admin Panel
         </h1>
         <p style={{ color: "#3a5a7a", fontSize: "0.8rem", margin: "4px 0 0" }}>
-          {vehicles.length} vehicles registered · {flashedIds.size} flashed · {vehicles.length - flashedIds.size} pending
+          {totalVehicleCount} vehicles registered - {flashedIds.size} flashed - {totalVehicleCount - flashedIds.size} pending
         </p>
       </div>
 
@@ -255,11 +271,14 @@ export default function Admin() {
 
         {/* Vehicle List */}
         <div>
-          <AdminCard title={`📋 Vehicle Registry (${vehicles.length})`}>
+          <AdminCard title={"Vehicle Registry (" + totalVehicleCount + ")"}>
+            <div style={{ color: "#3a6a8a", fontSize: "0.72rem", marginBottom: "0.5rem" }}>
+              Showing 50 most recently added. Total: {totalVehicleCount}
+            </div>
             <div style={{ maxHeight: 420, overflowY: "auto", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-              {vehicles.length === 0 ? (
+              {recentVehicles.length === 0 ? (
                 <div style={{ color: "#3a5a7a", fontSize: "0.8rem", textAlign: "center", padding: "2rem" }}>No vehicles registered yet</div>
-              ) : vehicles.map((v) => {
+              ) : recentVehicles.map((v) => {
                 const isFlashed = flashedIds.has(v.id);
                 return (
                   <div key={v.id} style={{
@@ -272,7 +291,7 @@ export default function Admin() {
                         {v.vehicle_number}
                       </span>
                       {isFlashed && <span style={{ color: "#2a6a4a", fontSize: "0.7rem", marginLeft: 6 }}>✓ FLASHED</span>}
-                      <div style={{ color: "#3a5a7a", fontSize: "0.72rem" }}>{v.zone} · {v.customer_name}</div>
+                      <div style={{ color: "#3a5a7a", fontSize: "0.72rem" }}>{v.zone} - {v.customer_name}</div>
                     </div>
                     {!isFlashed && (
                       <button onClick={() => deleteVehicle(v.id, v.vehicle_number)} style={{
